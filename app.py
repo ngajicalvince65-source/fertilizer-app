@@ -13,7 +13,9 @@ scope = [
 
 @st.cache_resource
 def connect_to_sheet():
-    creds = Credentials.from_service_account_file("credentials.json", scopes=scope)
+    creds_dict = dict(st.secrets["gcp_service_account"])
+    creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
     client = gspread.authorize(creds)
     sheet = client.open_by_key(SHEET_ID).sheet1
     if sheet.row_count == 0 or sheet.cell(1, 1).value is None:
